@@ -1,18 +1,14 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Install Package:           'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-
+#' @import shiny
+#' @import sortable
+#' @import purrr
+#' @import readxl
+#' @import lubridate
+#' @import dplyr
+#' @import tidyr
+#' @import stringr
+#' @import ggplot2
+#' @import sf
+#' @import svglite
 
 #' Modified Richard Equation
 #'
@@ -22,18 +18,14 @@
 #' @param r_min Float : Maximum Growth/Death rate (positive for growth|negative fo death)
 #' @param s     Float : Shift (Time at which r_max occurs)
 #' @return The population at time \code{t} Given by \deqn{P(t) = p_{min} + \frac{p_{max}-p_{min}}{1 + e^{4r_{max}.(t-s)/p_{min}- p_{max}}}}
-#' @return
-#' @examples
-#' add(1, 1)
-#' add(10, 1)
 richard <- function(t, p_max, p_min, r_max, s){
   p_t <- p_min + (p_max - p_min) / (1 + exp(4 * r_max * (t - s)/(p_min - p_max)))
   return(p_t)
   }
 
-linear <- function(x,a,b){a * x + b}
+linear <- function(t,a,b){a * t + b}
 
-fit_richard <- function(y, t, method = "LAD") {
+fit_richard <- function(y, t, method = "LAD", model = "richard") {
 
   lin <- lm(y ~ t)
   r_estimate <- lin$coefficients[2]
@@ -53,23 +45,36 @@ fit_richard <- function(y, t, method = "LAD") {
 
   suggestions <- cbind(estimates$p_max, estimates$p_min, estimates$r_max, estimates$s)
 
-
-
-  fitness_fun <- switch(method,
-    "LAD" = \(p) -sum(abs(y - richard(t, p[1], p[2], p[3], p[4]))),
-    "OLS" = \(p) -sum((y - richard(t, p[1], p[2], p[3], p[4]))^2),
-    "MLE" = \(p) sum(log(dnorm(y, max_y, 0.01*(max_y-min_y))+dnorm(y, min_y, 0.01*(max_y-min_y))))
+  model_fun <- switch(model,
+    "richard" = richard,
+    "linear"  = linear,
   )
 
-#do.call(richard, append(list(t),p))
+  lower <- switch(model,
+    "richard" = c(p_max = max_y - 0.05*(max_y-min_y),
+                  p_min = 0,
+                  r_max = min(0 , r_estimate * 100),
+                  s     = 0),
+    "linear"  = c(a = 0,
+                  b = 0),
+  )
+
+  upper <- switch(model,
+    "richard" = c(p_max = max_y + 0.05*(max_y-min_y),
+                  p_min = min_y + 0.05*(max_y-min_y),
+                  r_max = max(0 , r_estimate * 100),
+                  s     = s_boundary))
+
+  fitness_fun <- switch(method,
+    "LAD" = \(p) -sum(abs(y - do.call(model, append(list(t),p)))),
+    "OLS" = \(p) -sum((y - do.call(model, append(list(t),p)))^2),
+  )
+
+
 fit <- GA::de(type = "real-valued",
               fitness = fitness_fun,
               suggestions = suggestions,
-              lower   = c(
-                p_max = max_y - 0.05*(max_y-min_y),
-                p_min = 0,
-                r_max = min(0 , r_estimate * 100),
-                s     = 0),
+              lower   = lower,
               upper = c(
                 p_max = max_y + 0.05*(max_y-min_y),
                 p_min = min_y + 0.05*(max_y-min_y),
@@ -91,12 +96,11 @@ fit <- GA::de(type = "real-valued",
   # })
 }
 
-#'
+#' Clean time column
 #'
 #' @param .data     Float : Dataframe
 #' @param .time_col String : Name of the time column from the plate reader experiment
 #' @return The dataframe with the formated time column as elapsed hours
-#' @examples
 clean_time <- function(.data, .time_col) {
   .data |>
     mutate(
@@ -106,10 +110,11 @@ clean_time <- function(.data, .time_col) {
     )
 }
 
+#' Format into long format
+#'
 #' @param .data Float : Dataframe
 #' @param wells Tidyselect : Tidyselect matching all the wells columns from your plate reader experiment
 #' @return The dataframe in long/tidy format
-#' @examples
 format_wellplate_long <- function(.data, wells = matches(regex("^[A-Za-z]{1}\\d{1,2}"))) {
   .data |>
     pivot_longer(cols = {{wells}},
