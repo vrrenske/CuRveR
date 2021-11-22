@@ -4,7 +4,7 @@ library(purrr)
 library(ggplot2)
 library(svglite)
 
-source(file = "R/hello.R")
+source(file = "R/hello.R", local = TRUE)
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
