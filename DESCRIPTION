@@ -32,5 +32,4 @@ LazyData: true
 RoxygenNote: 7.1.2
 Remotes: github::coolbutuseless/ggpattern
 Collate:
-    'hello.R'
     'CuRveR.R'
