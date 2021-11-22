@@ -4,6 +4,8 @@ library(purrr)
 library(ggplot2)
 library(svglite)
 
+source(file = "R/hello.R")
+
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 modalSavePlot <- function() {
