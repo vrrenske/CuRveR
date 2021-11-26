@@ -4,7 +4,7 @@ library(purrr)
 library(ggplot2)
 library(svglite)
 
-source(file = "hello.R", local = TRUE)
+source(file = "inst/myapp/hello.R", local = TRUE)
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
@@ -46,11 +46,7 @@ color_tile_from_0 <- function(...) {
 ############################################################################
 ############################################################################
 
-ui <-
-
-
-
-  navbarPage(title = div(img(src='Logo.svg',
+ui <- navbarPage(title = div(img(src='Logo.svg',
                              height = "100%")),
              windowTitle = "CuRveR",
              id = "current_tab",
