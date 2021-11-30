@@ -11,8 +11,6 @@
 #' @import svglite
 
 #'@include hello.R
-#'@include app.R
-#'@include zzz.R
 
 #' @export
 run_curver <- function() {
