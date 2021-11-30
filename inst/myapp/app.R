@@ -4,7 +4,7 @@ library(purrr)
 library(ggplot2)
 library(svglite)
 
-devtools::load_all()
+devtools::load_all("CuRveR")
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
