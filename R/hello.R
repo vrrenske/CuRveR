@@ -96,7 +96,7 @@ fit <- GA::de(type = "real-valued",
 #' @param .data     Float : Dataframe
 #' @param .time_col String : Name of the time column from the plate reader experiment
 #' @return The dataframe with the formated time column as elapsed hours
-#' @export clean_time
+#' @export
 clean_time <- function(.data, .time_col) {
   .data |>
     mutate(
