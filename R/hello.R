@@ -1,27 +1,19 @@
-#' @import shiny
-#' @import sortable
-#' @import purrr
-#' @import readxl
-#' @import lubridate
-#' @import dplyr
-#' @import tidyr
-#' @import stringr
-#' @import ggplot2
-#' @import sf
-#' @import svglite
-
-
+#' Richard equation
+#'
+#' Return the population at time t
+#'
+#' @export
 #' @param t     Float : Time
 #' @param p_max Float : Population Maximum (Upper Asymptote)
 #' @param p_min Float : Population Minimum (Lower Asymptote)
 #' @param r_min Float : Maximum Growth/Death rate (positive for growth|negative fo death)
 #' @param s     Float : Shift (Time at which r_max occurs)
 #' @return The population at time \code{t} Given by \deqn{P(t) = p_{min} + \frac{p_{max}-p_{min}}{1 + e^{4r_{max}.(t-s)/p_{min}- p_{max}}}}
-#' @export
 richard <- function(t, p_max, p_min, r_max, s){
-  p_t <- p_min + (p_max - p_min) / (1 + exp(4 * r_max * (t - s)/(p_min - p_max)))
-  return(p_t)
-  }
+
+  p_min + (p_max - p_min) / (1 + exp(4 * r_max * (t - s)/(p_min - p_max)))
+}
+
 
 #' @export
 linear <- function(t,a,b){a * t + b}
@@ -34,6 +26,7 @@ fit_richard <- function(y, t, method = "LAD", model = "richard") {
   sign <- sign(r_estimate)
   max_y <- max(y)
   min_y <- min(y)
+
 
   s_boundary <- max(as.numeric(t))
 
