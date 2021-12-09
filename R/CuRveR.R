@@ -10,9 +10,9 @@
 #' @import sf
 #' @import svglite
 
-#'@include hello.R
+#' @include hello.R
 
-#' @export
+#' @export run_curver
 run_curver <- function() {
   appDir <- system.file("myapp", package = "CuRveR")
   if (appDir == "") {

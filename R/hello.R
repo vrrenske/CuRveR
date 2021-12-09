@@ -2,7 +2,7 @@
 #'
 #' Return the population at time t
 #'
-#' @export
+#' @export richard
 #' @param t     Float : Time
 #' @param p_max Float : Population Maximum (Upper Asymptote)
 #' @param p_min Float : Population Minimum (Lower Asymptote)
@@ -15,10 +15,10 @@ richard <- function(t, p_max, p_min, r_max, s){
 }
 
 
-#' @export
+#' @export linear
 linear <- function(t,a,b){a * t + b}
 
-#' @export
+#' @export fit_richard
 fit_richard <- function(y, t, method = "LAD", model = "richard") {
 
   lin <- lm(y ~ t)
@@ -65,7 +65,7 @@ fit_richard <- function(y, t, method = "LAD", model = "richard") {
     "OLS" = \(p) -sum((y - do.call(model, append(list(t),p)))^2),
   )
 
-#' @export
+
 fit <- GA::de(type = "real-valued",
               fitness = fitness_fun,
               suggestions = suggestions,
@@ -96,7 +96,7 @@ fit <- GA::de(type = "real-valued",
 #' @param .data     Float : Dataframe
 #' @param .time_col String : Name of the time column from the plate reader experiment
 #' @return The dataframe with the formated time column as elapsed hours
-#' @export
+#' @export clean_time
 clean_time <- function(.data, .time_col) {
   .data |>
     mutate(
@@ -111,7 +111,7 @@ clean_time <- function(.data, .time_col) {
 #' @param .data Float : Dataframe
 #' @param wells Tidyselect : Tidyselect matching all the wells columns from your plate reader experiment
 #' @return The dataframe in long/tidy format
-#' @export
+#' @export format_wellplate_long
 format_wellplate_long <- function(.data, wells = matches(regex("^[A-Za-z]{1}\\d{1,2}"))) {
   .data |>
     pivot_longer(cols = {{wells}},
@@ -121,7 +121,7 @@ format_wellplate_long <- function(.data, wells = matches(regex("^[A-Za-z]{1}\\d{
 
 
 
-#' @export
+#' @export fit_data
 fit_data <- function(.data, .groups ,.value, .time, method = "LAD") {
   .data |>
     select({{.groups}}, {{.value}}, {{.time}}) |>
@@ -136,5 +136,5 @@ fit_data <- function(.data, .groups ,.value, .time, method = "LAD") {
 
 }
 
-#' @export
+#' @export m_score
 m_score <- function(data) {.6745*(data-median(data))/mad(data)}
